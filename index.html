@@ -49,6 +49,33 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
+        .slide-link {
+            display: none;
+            position: absolute;
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(212, 165, 116, 0.9);
+            color: #000;
+            padding: 15px 40px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .slide-link:hover {
+            background: #d4a574;
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 5px 20px rgba(212, 165, 116, 0.5);
+        }
+
+        .slide-link.active {
+            display: inline-block;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -158,6 +185,12 @@
             .page-indicator {
                 display: none;
             }
+
+            .slide-link {
+                font-size: 16px;
+                padding: 12px 30px;
+                bottom: 10%;
+            }
         }
 
         @media (max-width: 480px) {
@@ -178,6 +211,11 @@
             .slide-counter {
                 padding: 6px 15px;
             }
+
+            .slide-link {
+                font-size: 14px;
+                padding: 10px 25px;
+            }
         }
     </style>
 </head>
@@ -185,6 +223,7 @@
     <div class="presentation-container">
         <div class="slide-viewer" id="slideViewer">
             <div class="loading">Загрузка...</div>
+            <a href="https://lumixprint.ru" target="_blank" class="slide-link" id="slideLink">Посетить lumixprint.ru</a>
         </div>
 
         <div class="controls">
@@ -208,11 +247,11 @@
 
         function loadSlides() {
             const slideViewer = document.getElementById('slideViewer');
-            slideViewer.innerHTML = '';
+            const loading = slideViewer.querySelector('.loading');
             
             for (let i = 1; i <= totalSlidesCount; i++) {
                 const img = document.createElement('img');
-                img.src = `slide${i}.jpg`;
+                img.src = `slide${i}.png`;
                 img.className = 'slide';
                 img.alt = `Слайд ${i}`;
                 if (i === 1) img.classList.add('active');
@@ -222,7 +261,11 @@
                     this.alt = `Ошибка загрузки слайда ${i}`;
                 };
                 
-                slideViewer.appendChild(img);
+                img.onload = function() {
+                    if (i === 1) loading.style.display = 'none';
+                };
+                
+                slideViewer.insertBefore(img, slideViewer.querySelector('.slide-link'));
                 slides.push(img);
             }
 
@@ -260,6 +303,10 @@
             dots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === currentSlide);
             });
+
+            // Показываем ссылку только на последнем слайде (слайд 5)
+            const slideLink = document.getElementById('slideLink');
+            slideLink.classList.toggle('active', currentSlide === 4);
 
             updateControls();
         }
